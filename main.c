@@ -9,6 +9,7 @@ extern void SystemClock_Config(void);
 extern void Error_Handler(void);
 void plot_input_signal(void);
 void plot_output_signal(void);
+void plot_both_signal(void);
 
 uint32_t numBlocks = SIG_LENGTH/BLOCK_SIZE;
 extern float32_t inputSignal_f32_1kHz_15kHz[SIG_LENGTH];
@@ -40,7 +41,8 @@ int main(void)
 	{
 		arm_fir_f32(&_1kHz_15kHz_sig, &inputSignal_f32_1kHz_15kHz[0] + (i*BLOCK_SIZE), &outputSignal_f32[0] + (i*BLOCK_SIZE), BLOCK_SIZE);
 	}
-	plot_output_signal();
+	
+	plot_both_signal();
 	
 	while(1)
 	{
@@ -69,7 +71,21 @@ void plot_output_signal(void)
 		outputSample = outputSignal_f32[i];
 		//add delay to prevent crush of logic analyzer
 		for(j=0;j<30000;j++){}
-			//if(i==(SIG_LENGTH-1)) i=0; // restart signal
+			if(i==(SIG_LENGTH-1)) i=0; // restart signal
+	}
+}
+
+void plot_both_signal(void)
+{
+	int i,j;
+	
+	for(i=0; i<SIG_LENGTH; i++)
+	{
+		inputSample = inputSignal_f32_1kHz_15kHz[i];
+		outputSample = outputSignal_f32[i];
+		//add delay to prevent crush of logic analyzer
+		for(j=0;j<30000;j++){}
+			if(i==(SIG_LENGTH-1)) i=0; // restart signal
 	}
 }
 	
