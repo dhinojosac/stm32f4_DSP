@@ -1,5 +1,9 @@
 #include "arm_math.h"                   // ARM::CMSIS:DSP
 
+float32_t _5hz_signal[301] =
+{
+	
+};
 
 float32_t inputSignal_f32_1kHz_15kHz[320] =
 {

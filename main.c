@@ -5,19 +5,25 @@
 #define NUM_TAPS   29		//TAPS for FIR filter
 #define BLOCK_SIZE 32
 
+// Functions declarations
 extern void SystemClock_Config(void);
 extern void Error_Handler(void);
 void plot_input_signal(void);
 void plot_output_signal(void);
 void plot_both_signal(void);
+void plot_x_signal(void);
 
-uint32_t numBlocks = SIG_LENGTH/BLOCK_SIZE;
 extern float32_t inputSignal_f32_1kHz_15kHz[SIG_LENGTH];
+uint32_t numBlocks = SIG_LENGTH/BLOCK_SIZE;
 uint32_t freq;
-float32_t inputSample, outputSample;
 
 float32_t outputSignal_f32[SIG_LENGTH];
 static float32_t firStateF32[BLOCK_SIZE + NUM_TAPS - 1];
+
+extern float32_t _5hz_signal[301];
+
+// Variables to plot 
+float32_t inputSample, outputSample, xSample;
 
 //FIR filter coefficients (low pass)
 const float32_t firCoeffs32[NUM_TAPS] = {
@@ -42,10 +48,24 @@ int main(void)
 		arm_fir_f32(&_1kHz_15kHz_sig, &inputSignal_f32_1kHz_15kHz[0] + (i*BLOCK_SIZE), &outputSignal_f32[0] + (i*BLOCK_SIZE), BLOCK_SIZE);
 	}
 	
-	plot_both_signal();
+	//plot_both_signal();
+	plot_x_signal();
 	
 	while(1)
 	{
+	}
+}
+
+void plot_x_signal(void)
+{
+	int i,j;
+	
+	for(i=0; i<301; i++)
+	{
+		xSample = _5hz_signal[i];
+		//add delay to prevent crush of logic analyzer
+		for(j=0;j<30000;j++){}
+			if(i==(301-1)) i=0; // restart signal
 	}
 }
 
