@@ -8,12 +8,14 @@
 extern void SystemClock_Config(void);
 extern void Error_Handler(void);
 void plot_input_signal(void);
+void plot_output_signal(void);
 
+uint32_t numBlocks = SIG_LENGTH/BLOCK_SIZE;
 extern float32_t inputSignal_f32_1kHz_15kHz[SIG_LENGTH];
 uint32_t freq;
-float32_t inputSample;
+float32_t inputSample, outputSample;
 
-float32_t outputSignal[SIG_LENGTH];
+float32_t outputSignal_f32[SIG_LENGTH];
 static float32_t firStateF32[BLOCK_SIZE + NUM_TAPS - 1];
 
 //FIR filter coefficients (low pass)
@@ -32,10 +34,13 @@ int main(void)
 	SystemClock_Config();
 	
 	arm_fir_instance_f32 _1kHz_15kHz_sig;
-	
 	arm_fir_init_f32(&_1kHz_15kHz_sig, NUM_TAPS,(float32_t *)&firCoeffs32, &firStateF32[0], BLOCK_SIZE);
-
-	plot_input_signal();
+	
+	for(i=0; i<numBlocks; i++)
+	{
+		arm_fir_f32(&_1kHz_15kHz_sig, &inputSignal_f32_1kHz_15kHz[0] + (i*BLOCK_SIZE), &outputSignal_f32[0] + (i*BLOCK_SIZE), BLOCK_SIZE);
+	}
+	plot_output_signal();
 	
 	while(1)
 	{
@@ -52,6 +57,19 @@ void plot_input_signal(void)
 		//add delay to prevent crush of logic analyzer
 		for(j=0;j<30000;j++){}
 			if(i==(SIG_LENGTH-1)) i=0; // restart signal
+	}
+}
+
+void plot_output_signal(void)
+{
+	int i,j;
+	
+	for(i=0; i<SIG_LENGTH; i++)
+	{
+		outputSample = outputSignal_f32[i];
+		//add delay to prevent crush of logic analyzer
+		for(j=0;j<30000;j++){}
+			//if(i==(SIG_LENGTH-1)) i=0; // restart signal
 	}
 }
 	
